@@ -1,0 +1,9 @@
+# CRRC 本机源码启动覆盖配置：基于仓库源码运行后端，默认只连接内网/本机模型服务。
+services:
+  webserver:
+    image: crrc-dbchat:local
+    build:
+      context: .
+      dockerfile: docker/crrc-local/Dockerfile
+    container_name: crrc-dbchat-webserver
+    command: ["dbgpt", "start", "webserver", "--config", "/app/configs/crrc-offline-start.toml"]

@@ -1,5 +1,6 @@
 .env
 .git/
+/crrc_dbChat/
 ./.mypy_cache/
 models/
 plugins/

@@ -1,0 +1,50 @@
+[system]
+language = "zh"
+log_level = "INFO"
+api_keys = []
+encrypt_key = "replace-before-shared-deployment"
+
+[service.web]
+host = "0.0.0.0"
+port = 5670
+cors_allowed_origins = "http://localhost:3000,http://127.0.0.1:3000"
+
+[service.web.agent_context]
+max_context_tokens = 0
+reserved_tokens = 4096
+warning_threshold = 0.70
+error_threshold = 0.90
+critical_threshold = 0.95
+min_keep_recent_rounds = 3
+max_observation_age_rounds = 5
+truncated_observation_max_chars = 200
+min_keep_tokens = 10000
+max_compact_failures = 3
+max_parallel_subagents = 3
+
+[service.web.database]
+type = "mysql"
+host = "${env:MYSQL_HOST:-db}"
+port = 3306
+database = "${env:MYSQL_DATABASE:-dbgpt}"
+user = "${env:MYSQL_USER:-root}"
+password = "${env:MYSQL_PASSWORD:-aa123456}"
+
+[rag.storage]
+[rag.storage.vector]
+type = "chroma"
+persist_path = "pilot/data"
+
+# 本机 OpenAI 兼容模型服务（例如 Ollama）；保持本地地址，不配置云端 fallback。
+[models]
+[[models.llms]]
+name = "${env:LLM_MODEL_NAME:-local-model}"
+provider = "proxy/openai"
+api_base = "${env:LOCAL_MODEL_API_BASE:-http://host.docker.internal:11434/v1}"
+api_key = "${env:LOCAL_MODEL_API_KEY:-local-only}"
+
+[[models.embeddings]]
+name = "${env:EMBEDDING_MODEL_NAME:-local-embedding}"
+provider = "proxy/openai"
+api_url = "${env:LOCAL_EMBEDDING_API_URL:-http://host.docker.internal:11434/v1/embeddings}"
+api_key = "${env:LOCAL_MODEL_API_KEY:-local-only}"
