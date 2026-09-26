@@ -298,7 +298,7 @@ bash ./scripts/examples/load_examples.sh
 如果你需要进行前端开发或自定义 UI：
 
 ```bash
-cd web && npm install
+cd web && corepack yarn install --frozen-lockfile --non-interactive
 cp .env.template .env
 # 编辑 .env，将 API_BASE_URL 设为 http://localhost:5670
 npm run dev

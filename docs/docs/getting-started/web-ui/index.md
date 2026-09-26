@@ -43,7 +43,7 @@ http://localhost:5670
 For front-end development, you can run the Next.js app independently:
 
 ```bash
-cd web && npm install
+cd web && corepack yarn install --frozen-lockfile --non-interactive
 cp .env.template .env
 # Set API_BASE_URL=http://localhost:5670
 npm run dev

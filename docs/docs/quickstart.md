@@ -449,7 +449,7 @@ Open your browser and visit [`http://localhost:5670`](http://localhost:5670)
 You can also run the web front-end separately:
 
 ```bash
-cd web && npm install
+cd web && corepack yarn install --frozen-lockfile --non-interactive
 cp .env.template .env
 // Set API_BASE_URL to your DB-GPT server address, usually http://localhost:5670
 npm run dev

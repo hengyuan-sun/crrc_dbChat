@@ -3,7 +3,7 @@ FROM node:lts
 WORKDIR /app
 COPY . /app
 
-RUN yarn install
+RUN npm ci
 
 RUN npm run build
 

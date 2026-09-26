@@ -43,7 +43,7 @@ http://localhost:5670
 如果你要做前端开发，也可以单独运行 Next.js 应用：
 
 ```bash
-cd web && npm install
+cd web && corepack yarn install --frozen-lockfile --non-interactive
 cp .env.template .env
 # 设置 API_BASE_URL=http://localhost:5670
 npm run dev

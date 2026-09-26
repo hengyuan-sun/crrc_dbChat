@@ -1,99 +1,26 @@
+# crrc_dbChat Web
 
-<h1 align="center">
-  <a href="https://dbgpt.site"><img width="180" src="/crrc-changchun-logo.svg" alt="CRRC 长客股份"></a>
-  <br>
-  crrc_dbChat Web
-</h1>
+本目录包含企业平台的浏览器界面，基于 Next.js。开发环境需要 Node.js 18 或更高版本，并使用 Corepack 管理的 Yarn 1.22.22。依赖安装只使用 `yarn.lock`。
 
-_<p align="center">crrc_dbChat Chat UI, LLM to Vision.</p>_
+## 安装与开发
 
-<p align="center">
-  <a href="https://github.com/eosphoros-ai/crrc_dbChat Web/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-blue.svg?label=License&style=flat" />
-  </a>
-  <a href="https://github.com/eosphoros-ai/crrc_dbChat/releases">
-    <img alt="Release Notes" src="https://img.shields.io/github/release/eosphoros-ai/crrc_dbChat" />
-  </a>
-  <a href="https://github.com/eosphoros-ai/crrc_dbChat Web/issues">
-    <img alt="Open Issues" src="https://img.shields.io/github/issues-raw/eosphoros-ai/crrc_dbChat Web" />
-  </a>
-  <a href="https://discord.gg/7uQnPuveTY">
-    <img alt="Discord" src="https://dcbadge.vercel.app/api/server/7uQnPuveTY?compact=true&style=flat" />
-  </a>
-</p>
-
----
-
-## 👋 Introduction
-
-***crrc_dbChat Web*** is an **Open source chat UI** for [**crrc_dbChat**](https://github.com/eosphoros-ai/crrc_dbChat).
-Also, it is a **LLM to Vision** solution. 
-
-[crrc_dbChat Web](https://dbgpt.site) is an Open source Tailwind and Next.js based chat UI for AI and GPT projects. It beautify a lot of markdown labels, such as `table`, `thead`, `th`, `td`, `code`, `h1`, `h2`, `ul`, `li`, `a`, `img`. Also it define some custom labels to adapted to AI-specific scenarios. Such as `plugin running`, `knowledge name`, `Chart view`, and so on.
-
-## 💪🏻 Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) >= 16
-- [npm](https://npmjs.com/) >= 8
-- [yarn](https://yarnpkg.com/) >= 1.22
-- Supported OSes: Linux, macOS and Windows
-
-### Installation
-
-Using **Yarn** is recommended for dependency management.
-
-```sh
-# Install dependencies
-npm install
-yarn install
+```powershell
+corepack enable
+corepack yarn install --frozen-lockfile --non-interactive
+Copy-Item .env.template .env
+corepack yarn dev
 ```
 
-### Usage
-```sh
-cp .env.template .env
-```
-edit the `API_BASE_URL` to the real address
+在 `.env` 中按本机 API 地址配置前端环境。真实地址和凭据不要写入版本库；离线环境需先将锁文件对应的包导入批准的内网缓存。
 
-```sh
-# development model
-npm run dev
-yarn dev
+## 构建与测试
+
+```powershell
+corepack yarn test
+corepack yarn build
+corepack yarn export
 ```
 
-## 🚀 Use In crrc_dbChat
+构建由 `scripts/run-next.js` 启动 Next.js，以兼容 Windows 与 Linux，并禁用框架遥测。静态导出写入 `out/`；项目部署脚本 `scripts/build_web_static.sh` 会将静态文件复制到 API 服务资源目录。静态导出不包含 Next.js rewrites，部署环境必须由内网入口或 API_BASE_URL 提供正确 API 路径。
 
-```sh
-bash ../scripts/build_web_static.sh
-```
-
-## 📚 Documentation
-
-For full documentation, visit [document](https://docs.dbgpt.site/).
-
-
-## Usage
-  [gpt-vis](https://github.com/eosphoros-ai/crrc_dbChat/gpt-vis) for markdown support.
-  [ant-design](https://github.com/ant-design/ant-design) for ui components.
-  [next.js](https://github.com/vercel/next.js) for server side rendering.
-  [@antv/g2](https://github.com/antvis/g2#readme) for charts.
-
-## License
-
-crrc_dbChat Web is licensed under the [MIT License](LICENSE).
-
----
-
-Enjoy using crrc_dbChat Web to build stunning UIs for your AI and GPT projects.
-
-🌟 If you find it helpful, don't forget to give it a star on GitHub! Stars are like little virtual hugs that keep us going! We appreciate every single one we receive.
-
-For any queries or issues, feel free to open an [issue](https://github.com/eosphoros-ai/crrc_dbChat Web/issues) on the repository.
-
-Happy coding! 😊
-
-
-## antdbgptweb installation
-
-### deploy in local environment:
+构建的并发可通过 `NEXT_BUILD_CPUS` 设置，默认 4；静态页面收集超时为 180 秒。若修改图表依赖，先检查 d3 版本解析和实际页面渲染，不能仅凭构建成功判定所有可视化运行正常。

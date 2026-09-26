@@ -25,7 +25,7 @@ else
 fi
 
 
-yarn install
+corepack yarn install --frozen-lockfile --non-interactive
 rm -rf ../web/out/
 yarn compile
 

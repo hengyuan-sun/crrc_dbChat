@@ -198,7 +198,7 @@ If the Web UI loads and you can start a chat conversation, your DB-GPT is ready 
 - **Run the web front-end separately**
 
   ```bash
-  cd web && npm install
+  cd web && corepack yarn install --frozen-lockfile --non-interactive
   cp .env.template .env
   # Edit .env — set API_BASE_URL=http://localhost:5670
   npm run dev

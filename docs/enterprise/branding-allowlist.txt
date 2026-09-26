@@ -4,3 +4,4 @@ NOTICE
 licenses/
 third_party/
 docs/enterprise/identifier-inventory.csv
+docs/enterprise/identifier-migration-map.csv

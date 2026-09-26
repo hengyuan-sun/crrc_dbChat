@@ -40,10 +40,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: yarn
+          cache-dependency-path: web/yarn.lock
 
       - name: Install dependencies
         run: |
-          yarn install
+          corepack enable
+          corepack yarn install --frozen-lockfile --non-interactive
 
       - name: Build web application
         run: |

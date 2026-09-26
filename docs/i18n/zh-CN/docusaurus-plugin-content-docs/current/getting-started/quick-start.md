@@ -198,7 +198,7 @@ uv run dbgpt start webserver --config configs/dbgpt-proxy-ollama.toml
 - **单独运行前端**
 
   ```bash
-  cd web && npm install
+  cd web && corepack yarn install --frozen-lockfile --non-interactive
   cp .env.template .env
   # Edit .env — set API_BASE_URL=http://localhost:5670
   npm run dev

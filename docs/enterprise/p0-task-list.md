@@ -47,6 +47,17 @@
 - [x] 修复 `Flow Service.create()` 覆盖基类后未返回/未持久化的问题，并补充回归测试。
 - [ ] 回归测试文件因当前 Python 环境缺少 `sqlalchemy`，在导入阶段失败；安装批准依赖后需重跑。尚未覆盖的全仓关键函数、TypeScript/JSDoc 和权限行为仍需继续盘点/实现。
 
+## P1 命名迁移进度
+
+- [x] 根据当前 workspace `pyproject.toml` 建立 Python distribution/namespace、CLI、环境变量、序列化类路径和现有 Compose volume 的目标映射，见 [`identifier-migration-map.csv`](identifier-migration-map.csv)。
+- [ ] 尚未重命名运行代码、目录、发布元数据、数据库记录或容器资源；映射文档不是迁移完成证据。后续须按模块迁移、修复反射/序列化引用并在数据库副本上演练。
+
+## P1.1 前端依赖底座进度
+
+- [x] Web 统一使用 Corepack Yarn 1.22.22 + `yarn.lock`；文档站统一使用 npm `ci` + `package-lock.json`；移除重复锁文件并修改 CI/构建脚本。
+- [x] 解除 G2 与 d3-array 版本冲突；当前 Yarn 缓存完成一次离线冻结锁安装，Web 测试 20 项、生产构建、58 路由静态导出和首页/Flow/Prompt/两个 CRRC SVG 共 5 条本地 HTTP smoke 均通过。
+- [ ] 尚无干净内网环境依赖闭包、Node/系统基础镜像 digest、SBOM；离线冻结锁通过使用的是已经联网导入过制品的临时缓存，不是首次冷启动证明。文档站 `npm ci` 因 registry 请求长时间未完成而中止，站点/容器构建未验收；实际应用运行镜像仍未更新。
+
 ## 当前 P0 验收状态
 
 P0 的静态基线材料已生成；P0 尚未全部验收完成：来源哈希、完整路由授权证据、数据对象负责人、业务黄金集、内网身份/GPU/制品库等输入仍缺。因而当前报告可以作为团队可执行清单，不能标记企业平台 ready 或生产安全。

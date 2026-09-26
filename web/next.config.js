@@ -5,7 +5,11 @@ const path = require("path");
 const nextConfig = {
   experimental: {
     esmExternals: "loose",
+    // Windows 开发机和内网部署节点可能报告很多逻辑核；限制静态生成并发，避免 worker 被系统持续终止。
+    cpus: Number.parseInt(process.env.NEXT_BUILD_CPUS || "4", 10),
   },
+  // 大型 Agent/图表页面在受限构建机上需要更多预渲染时间，避免默认 60 秒反复重启 worker。
+  staticPageGenerationTimeout: 180,
   typescript: {
     ignoreBuildErrors: true,
   },

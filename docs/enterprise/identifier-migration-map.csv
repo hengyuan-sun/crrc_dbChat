@@ -1,0 +1,25 @@
+category,source_identifier,target_identifier,scope,migration_strategy,status,compatibility_or_evidence
+distribution,dbgpt,crrc-dbchat-core,packages/dbgpt-core/pyproject.toml,rename distribution metadata and all workspace references,planned,Core Python namespace target is crrc_dbchat
+python_namespace,dbgpt,crrc_dbchat,packages/dbgpt-core/src/dbgpt/,rename source directory and rewrite first-party imports/dynamic paths,planned,Must update plugin loading and serialized type_cls values
+distribution,dbgpt-client,crrc-dbchat-client,packages/dbgpt-client/,rename package metadata and workspace references,planned,First-party distribution
+python_namespace,dbgpt_client,crrc_dbchat_client,packages/dbgpt-client/src/dbgpt_client/,rename source directory and rewrite first-party imports,planned,First-party namespace
+distribution,dbgpt-ext,crrc-dbchat-ext,packages/dbgpt-ext/,rename package metadata and workspace references,planned,First-party distribution; preserve unrelated external packages
+python_namespace,dbgpt_ext,crrc_dbchat_ext,packages/dbgpt-ext/src/dbgpt_ext/,rename source directory and rewrite first-party imports,planned,First-party namespace
+distribution,dbgpt-serve,crrc-dbchat-serve,packages/dbgpt-serve/,rename package metadata and workspace references,planned,First-party distribution
+python_namespace,dbgpt_serve,crrc_dbchat_serve,packages/dbgpt-serve/src/dbgpt_serve/,rename source directory and rewrite first-party imports,planned,First-party namespace
+distribution,dbgpt-app,crrc-dbchat-app,packages/dbgpt-app/,rename package metadata and workspace references,planned,First-party distribution
+python_namespace,dbgpt_app,crrc_dbchat_app,packages/dbgpt-app/src/dbgpt_app/,rename source directory and rewrite first-party imports,planned,First-party namespace
+distribution,dbgpt-sandbox,crrc-dbchat-sandbox,packages/dbgpt-sandbox/,rename package metadata and workspace references,planned,First-party distribution
+python_namespace,dbgpt_sandbox,crrc_dbchat_sandbox,packages/dbgpt-sandbox/src/dbgpt_sandbox/,rename source directory and rewrite first-party imports,planned,First-party namespace
+distribution,dbgpt-acc-auto,crrc-dbchat-acc-auto,packages/dbgpt-accelerator/dbgpt-acc-auto/,"rename metadata, workspace references and accelerator plugin lookup",planned,Verify CUDA/ROCm optional dependency groups
+python_namespace,dbgpt_acc_auto,crrc_dbchat_acc_auto,packages/dbgpt-accelerator/dbgpt-acc-auto/src/dbgpt_acc_auto/,rename source directory and rewrite first-party imports,planned,First-party accelerator namespace
+distribution,dbgpt-acc-flash-attn,crrc-dbchat-acc-flash-attn,packages/dbgpt-accelerator/dbgpt-acc-flash-attn/,rename metadata and workspace references,planned,Verify platform-specific build constraints
+python_namespace,dbgpt_acc_flash_attn,crrc_dbchat_acc_flash_attn,packages/dbgpt-accelerator/dbgpt-acc-flash-attn/src/dbgpt_acc_flash_attn/,rename source directory and rewrite first-party imports,planned,First-party accelerator namespace
+cli,dbgpt,crrc-dbchat,packages/dbgpt-core/pyproject.toml project.scripts,rename entry point and update scripts/docs/containers,planned,Keep one documented migration command if an administrator-facing compatibility window is required
+environment_prefix,DBGPT_,CRRC_DBCHAT_,configs and runtime environment lookups,define explicit environment key mapping per configuration field,planned,Do not change unrelated model/provider environment variables
+environment_prefix,DB_GPT_,CRRC_DBCHAT_,configs and runtime environment lookups,define explicit environment key mapping per configuration field,planned,Resolve collisions before changing defaults
+container_prefix,dbgpt-,crrc-dbchat-,docker/ Dockerfiles Compose and release scripts,rename image/service/container labels and pin resulting image digest,planned,Third-party base image names are external references and remain unchanged
+runtime_cache_path,~/.dbgpt,~/.crrc_dbchat,CLI profile config cache and local state,move with checksum and preserve the source until verified,planned,No deletion during migration
+serialized_type_path,dbgpt.*,crrc_dbchat.*,Flow JSON plugin metadata and persisted Python class paths,map exact import paths from the package migration manifest and convert offline,planned,Reject unknown paths and provide dry run backup restore and idempotency
+compose_project_volumes,db-gpt-main_dbgpt-data; db-gpt-main_dbgpt-message; db-gpt-main_dbgpt-myql-db,explicit existing volume names or reviewed crrc_dbchat volumes,docker-compose.yml and deployment manifests,bind existing volumes explicitly; never infer a new empty volume from project name,planned,Actual IDs verified in the runtime baseline report; preserve all content
+historical_source_records,DB-GPT / DB_GPT / DBGPT / db_gpt / db-gpt,central mapping plus legal LICENSE NOTICE and third-party records,first-party runtime code and docs vs legal attribution,remove first-party product identifiers while retaining legal source attribution and this mapping,planned,Do not rewrite Git history or third-party license texts

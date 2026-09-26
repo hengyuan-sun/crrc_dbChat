@@ -298,7 +298,7 @@ bash ./scripts/examples/load_examples.sh
 For front-end development or custom UI work:
 
 ```bash
-cd web && npm install
+cd web && corepack yarn install --frozen-lockfile --non-interactive
 cp .env.template .env
 # Edit .env — set API_BASE_URL=http://localhost:5670
 npm run dev

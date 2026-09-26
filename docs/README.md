@@ -1,49 +1,23 @@
-# DB-GPT documentation 
+# crrc_dbChat 文档站
 
-## Quick Start
+文档站使用 Docusaurus，锁定依赖由 `package-lock.json` 管理，安装时使用 npm `ci` 模式。
 
-### Install dependencies 
-- Clone current project firstly!
-- Install docusaurus dependencies, generate node_modules folder.
+## 本地预览
 
-```
-yarn install
-```
-
-### launch
-``` 
-yarn start
+```powershell
+Set-Location docs
+npm ci
+npm run start
 ```
 
-The default service starts on port `3000`, visit `localhost:3000`
+默认访问 `http://localhost:3000`。构建静态站点运行 `npm run build`，生成目录为 `docs/build/`。
 
-## Deploy Multi-Version Documentation
+## 容器
 
-We can deploy multiple versions of the documentation by docker.
+单版本文档可从仓库根目录构建：
 
-### Build Docker Image
-
-Firstly, build the docker image in `DB-GPT` project root directory.
-
-```bash
-# Use the default NPM_REGISTRY=https://registry.npmjs.org
-# Use https://www.npmmirror.com/
-NPM_REGISTRY=https://registry.npmmirror.com
-docker build -f docs/Dockerfile-deploy \
--t eosphorosai/dbgpt-docs \
---build-arg NPM_REGISTRY=$NPM_REGISTRY \
---build-arg CI=false \
---build-arg NUM_VERSION=2 .
+```powershell
+docker build -f docs/Dockerfile -t crrc-dbchat-docs:local .
 ```
 
-### Run Docker Container
-
-Run the docker container with the following command:
-```bash
-docker run -it --rm -p 8089:8089 \
---name my-dbgpt-docs \
--v $(pwd)/docs/nginx/nginx-docs.conf:/etc/nginx/nginx.conf \
-eosphorosai/dbgpt-docs
-```
-
-Open the browser and visit `localhost:8089` to see the documentation.
+`Dockerfile-deploy` 会根据 Git 标签生成多版本文档，并会访问版本历史/远程源；它目前不属于已验证的完全离线部署路径。容器基础镜像、npm 依赖缓存和 Git 历史制品需要进入内网发布清单后再进行断网验收。

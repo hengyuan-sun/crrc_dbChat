@@ -221,7 +221,7 @@ uv run dbgpt start webserver --config configs/dbgpt-local-glm.toml
 你也可以单独运行 Web 前端：
 
 ```bash
-cd web && npm install
+cd web && corepack yarn install --frozen-lockfile --non-interactive
 cp .env.template .env
 // Set API_BASE_URL to your DB-GPT server address, usually http://localhost:5670
 npm run dev

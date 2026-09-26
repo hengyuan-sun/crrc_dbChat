@@ -70,4 +70,4 @@ jobs:
           file: ./docs/Dockerfile-deploy
           platforms: linux/amd64
           push: true
-          tags: eosphorosai/dbgpt-docs:${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.ref_name }},eosphorosai/dbgpt-docs:latest
+          tags: ${{ github.repository_owner }}/crrc-dbchat-docs:${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.ref_name }},${{ github.repository_owner }}/crrc-dbchat-docs:latest
