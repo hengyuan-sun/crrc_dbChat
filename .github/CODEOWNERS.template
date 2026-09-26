@@ -1,0 +1,17 @@
+# 模板文件，不会被 GitHub 自动识别为 CODEOWNERS。
+# 将 @替换为已经确认且有仓库访问权限的 GitHub 团队或账号，再由维护者改名为 CODEOWNERS。
+
+# 身份、授权与组织同步
+/packages/dbgpt-serve/src/dbgpt_serve/utils/auth.py @确认后的身份团队
+/packages/dbgpt-serve/src/dbgpt_serve/organization_sync/ @确认后的身份团队
+
+# 工作流后端和画布
+/packages/dbgpt-core/src/dbgpt/core/awel/ @确认后的工作流团队
+/packages/dbgpt-serve/src/dbgpt_serve/flow/ @确认后的工作流团队
+/web/components/flow/ @确认后的工作流团队
+
+# 企业部署、离线依赖和运维
+/docker/ @确认后的平台团队
+/configs/ @确认后的平台团队
+/scripts/ @确认后的平台团队
+/docs/enterprise/ @确认后的维护团队

@@ -1,20 +1,39 @@
-# Description
+## 目标与改动
 
-Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.
+说明任务 ID、解决的问题、实际行为和涉及模块。
 
-# How Has This Been Tested?
+## 契约与兼容
 
-Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
+- [ ] API、Flow/Agent 序列化、数据库、缓存键、配置或 CLI 契约已列明
+- [ ] 需要的数据迁移、备份、幂等重跑和回退步骤已写明
+- [ ] 依赖、离线制品和公网访问影响已说明
+- [ ] 未把真实账号、密钥、业务数据或未经批准的模型权重提交到仓库
 
-# Snapshots:
+## 权限与运行边界
 
-Include snapshots for easier review.
+- [ ] 服务、DAO、异步 worker 和下载入口在正确的身份/workspace 范围内鉴权
+- [ ] 工具、SQL、文件、URL、代码执行和副作用有对应约束
+- [ ] 日志、异常和审计字段已脱敏
+- [ ] 修改关键函数的中文 docstring/JSDoc，并更新函数清单
 
-# Checklist:
+## 验证证据
 
-- [ ] My code follows the style guidelines of this project
-- [ ] I have already rebased the commits and make the commit message conform to the project standard.
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] Any dependent changes have been merged and published in downstream modules
+写出真实运行的命令、环境和结果；未运行项说明缺失依赖或阻塞。
+
+```text
+命令：
+结果：
+环境/制品版本：
+未运行项与原因：
+```
+
+## 评审与交接
+
+- [ ] 已自行检查 diff 和新增文件
+- [ ] 已更新相关架构/开发/运维文档
+- [ ] 已按 `docs/enterprise/task-handoff-template.md` 提供阶段交接信息
+- [ ] 跨模块契约和集成顺序已明确
+
+## 截图或运行记录
+
+如涉及 UI 或部署，请提供经脱敏的截图、日志或请求/响应证据。

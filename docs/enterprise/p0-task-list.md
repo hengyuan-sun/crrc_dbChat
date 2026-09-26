@@ -10,6 +10,8 @@
 - [x] AST 统计 Python 函数 docstring/中文说明覆盖率。
 - [x] 固化外部构建、运行时模型、Python/Node 依赖与数据存储风险清单。
 - [x] 保留现有数据库与持久卷，不实施迁移或清理。
+- [x] 建立阶段交接、团队模块边界、PR 审查清单、ADR 规范和未绑定真实账号的 CODEOWNERS 模板。
+- [x] 将根贡献指南及 GitHub PR 模板更新为 crrc_dbChat 企业协作要求。
 
 ## 阶段任务与验收证据
 
@@ -34,6 +36,10 @@
 3. 身份和 workspace 资源授权在扩展企业管理 UI 前落到服务和 DAO；不得以隐藏按钮替代后端权限。
 4. Agent、AWEL、RAG、SQL 和所有 connector 行为必须建立改名前后回归基线，不能通过删功能绕过迁移。
 5. 分阶段提交，提交说明列出影响范围、执行的命令和未通过项。远端推送前再次确认 diff 没有凭据、数据文件、嵌套仓库快照和生成物。
+
+## 协作脚手架状态
+
+模块角色、路径边界、接口约定、PR 审查与集成顺序见 [`team-development.md`](team-development.md)；阶段恢复模板见 [`task-handoff-template.md`](task-handoff-template.md)；ADR 规则见 [`adr/README.md`](adr/README.md)。仓库账号、CODEOWNERS、分支保护、必需评审和远端 CI 保护仍待维护者/管理员确认；这些模板尚未在 GitHub 上生效。
 
 ## 当前 P0 验收状态
 

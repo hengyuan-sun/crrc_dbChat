@@ -2,9 +2,9 @@
 
 本方案按用户已确认的「单企业、完全离线内网」设计。交付内容是设计、实施任务和开发提示词，尚未实施企业功能或替换当前运行服务。
 
-阅读顺序：本文件 → [实施计划](implementation-plan.md) → [完整提示词](development-prompts.md)。源码框架说明见 [learnProject](../learnProject.md)。
+阅读顺序：本文件 → [实施计划](implementation-plan.md) → [完整提示词](development-prompts.md)。源码框架说明见 [learnProject](../learnProject.md)。团队分工、接口约定和评审边界见[团队协作指南](team-development.md)；跨阶段恢复任务时使用[交接模板](task-handoff-template.md)，架构决策记录规范见 [`adr/`](adr/)。
 
-当前实施状态与证据见 [P0 基线报告](baseline-report.md)、[阶段任务清单](p0-task-list.md)、[路由权限核验规则](route-permission-matrix.md) 和 [关键函数清单](key-function-inventory.md)。产品改名残留可用 `python scripts/branding_audit.py` 扫描；命名迁移完成前，该命令会以退出码 1 列出未豁免命中。扫描器只豁免 `branding-allowlist.txt` 明确列出的许可归属和集中迁移映射文件。
+当前实施状态与证据见 [P0 基线报告](baseline-report.md)、[阶段任务清单](p0-task-list.md)、[路由权限核验规则](route-permission-matrix.md)、[关键函数清单](key-function-inventory.md) 和[品牌/组织模块状态](brand-and-org-module-status.md)。产品改名残留可用 `python scripts/branding_audit.py` 扫描；命名迁移完成前，该命令会以退出码 1 列出未豁免命中。扫描器只豁免 `branding-allowlist.txt` 明确列出的许可归属和集中迁移映射文件。
 
 ## 1. 目标、假设和范围
 
