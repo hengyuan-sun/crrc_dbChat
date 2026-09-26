@@ -41,12 +41,14 @@ type RouteItem = {
   IconComponent?: React.ComponentType<{ className?: string }>;
 };
 
+/** 根据菜单是否处于激活状态生成对应的侧栏样式。 */
 function smallMenuItemStyle(active?: boolean) {
   return `flex items-center justify-center mx-auto rounded w-14 h-14 text-xl hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors cursor-pointer ${
     active ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 shadow-sm' : ''
   }`;
 }
 
+/** 渲染带有激活态资源切换能力的图片菜单图标。 */
 function SidebarPictureIcon({
   src,
   activeSrc,
@@ -63,6 +65,7 @@ function SidebarPictureIcon({
   return <Image src={active && activeSrc ? activeSrc : src} alt={alt} width={size} height={size} />;
 }
 
+/** 渲染包含品牌入口、会话列表和应用导航的主侧栏。 */
 function SideBar() {
   const { isMenuExpand, setIsMenuExpand, mode, setMode } = useContext(ChatContext);
   const router = useRouter();
@@ -357,7 +360,7 @@ function SideBar() {
       {/* LOGO + Collapse Toggle */}
       <div className='flex items-center justify-between p-2 pb-4'>
         <Link href='/' className='flex items-center'>
-          <Image src={logo} alt='CRRC 长客股份' width={176} height={40} />
+          <Image src={logo} alt='CRRC 长客股份' width={108} height={90} />
         </Link>
         <Tooltip title={t('Close_Sidebar') || '收起侧栏'}>
           <div

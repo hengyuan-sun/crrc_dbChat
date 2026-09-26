@@ -1,0 +1,6 @@
+# 仅放置许可证归属或集中历史命名映射；不添加普通产品源码/文档。
+LICENSE
+NOTICE
+licenses/
+third_party/
+docs/enterprise/identifier-inventory.csv

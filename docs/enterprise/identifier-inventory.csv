@@ -1,0 +1,7 @@
+legacy_token,occurrences,files,planned_replacement,scope,notes
+dbgpt,25123,1687,crrc_dbchat,Python namespaces / identifiers / product-owned text,case-sensitive text scan; overlapping token counts; scan roots exclude root-level files
+DB-GPT,2170,633,crrc_dbChat,product-owned headings / UI / docs / generated assets,retain only legally required attribution and explicit migration-map records
+DBGPT,628,183,CRRC_DBCHAT or CrrcDbChat,constants / env / types / CLI after inventory,case-specific mapping; do not use blind lowercase replacement
+db_gpt,53,21,crrc_dbchat,Python snake-case identifiers / settings,review serialized and external protocol keys separately
+DB_GPT,18,8,CRRC_DBCHAT,environment variables / constants,provide data/config migration for persisted names
+db-gpt,33,19,crrc-dbchat,package/project / image / command identifiers,review deployment compatibility and persisted paths

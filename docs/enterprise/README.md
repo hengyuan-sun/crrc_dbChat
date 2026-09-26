@@ -4,6 +4,8 @@
 
 阅读顺序：本文件 → [实施计划](implementation-plan.md) → [完整提示词](development-prompts.md)。源码框架说明见 [learnProject](../learnProject.md)。
 
+当前实施状态与证据见 [P0 基线报告](baseline-report.md)、[阶段任务清单](p0-task-list.md)、[路由权限核验规则](route-permission-matrix.md) 和 [关键函数清单](key-function-inventory.md)。产品改名残留可用 `python scripts/branding_audit.py` 扫描；命名迁移完成前，该命令会以退出码 1 列出未豁免命中。扫描器只豁免 `branding-allowlist.txt` 明确列出的许可归属和集中迁移映射文件。
+
 ## 1. 目标、假设和范围
 
 目标是在内网形成企业 AI 数据平台，支持多部门工作空间、知识问答、受控自然语言问数、Agent 应用及 AWEL 工作流。登录、模型推理、embedding、reranker、存储、审计、依赖供应和运维均在内网完成。生产环境不调用阿里云百炼或其他公网 API；如使用通义系列模型，应引入经过审批的本地权重及推理服务。

@@ -1,0 +1,7 @@
+﻿package,python_functions,with_docstring,with_chinese_docstring,without_docstring,parse_errors
+dbgpt-app,1194,348,0,846,0
+dbgpt-client,99,51,0,48,0
+dbgpt-core,5403,3458,9,1945,0
+dbgpt-ext,1376,1152,1,224,0
+dbgpt-sandbox,154,83,83,71,0
+dbgpt-serve,2552,1177,27,1375,0
