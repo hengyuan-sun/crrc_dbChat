@@ -28,7 +28,18 @@ class OrganizationSyncService:
         self._directory = directory
 
     def read_and_validate(self) -> OrganizationSnapshot:
-        """读取上游快照并校验标识唯一性及组织关系完整性。"""
+        """读取目录快照并校验外部标识唯一性及组织关系引用完整性。
+
+        Returns:
+            OrganizationSnapshot: 通过本地完整性检查的原始快照，不会改写字段。
+
+        Raises:
+            ValueError: 外部 ID 为空/重复，或父组织、归属部门、用户部门引用未知时抛出。
+            Exception: 目录适配器读取失败时由适配器异常向上抛出。
+
+        本方法只检查快照内部引用，不验证组织树环、自引用、跨组织父子关系、版本
+        游标或身份权限；不写数据库、不停用账号、不授予角色，也不产生审计记录。
+        """
         snapshot = self._directory.read_snapshot()
         organization_ids = self._unique_ids(
             (item.external_id for item in snapshot.organizations), "组织"
@@ -65,7 +76,18 @@ class OrganizationSyncService:
         return snapshot
 
     def preview(self) -> OrganizationSyncPreview:
-        """生成只读预览，供未来管理页面展示同步规模。"""
+        """校验当前目录快照并生成组织、部门和账号数量的只读预览。
+
+        Returns:
+            OrganizationSyncPreview: 含目录版本和各类记录数量的汇总值。
+
+        Raises:
+            ValueError: 快照完整性校验失败。
+            Exception: 目录读取失败。
+
+        此预览可重复调用，但没有批次幂等键或快照持久化；它不提交同步、不修改
+        成员关系或角色，也不代表预览后数据未发生变化。
+        """
         snapshot = self.read_and_validate()
         return OrganizationSyncPreview(
             source_version=snapshot.source_version,
@@ -77,7 +99,18 @@ class OrganizationSyncService:
 
     @staticmethod
     def _unique_ids(values: Iterable[str], label: str) -> set[str]:
-        """校验外部标识非空且唯一，并返回标识集合。"""
+        """拒绝空值或重复的目录外部 ID，并返回唯一标识集合。
+
+        Args:
+            values: 同一实体类型的外部标识序列。
+            label: 用于构造中文校验错误的实体名称。
+
+        Returns:
+            set[str]: 输入中的唯一标识集合。
+
+        Raises:
+            ValueError: 任一标识为空白，或输入含重复值。
+        """
         collected = list(values)
         if any(not value or not value.strip() for value in collected):
             raise ValueError(f"{label}外部标识不能为空")

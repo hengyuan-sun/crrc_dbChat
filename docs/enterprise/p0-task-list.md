@@ -41,6 +41,12 @@
 
 模块角色、路径边界、接口约定、PR 审查与集成顺序见 [`team-development.md`](team-development.md)；阶段恢复模板见 [`task-handoff-template.md`](task-handoff-template.md)；ADR 规则见 [`adr/README.md`](adr/README.md)。仓库账号、CODEOWNERS、分支保护、必需评审和远端 CI 保护仍待维护者/管理员确认；这些模板尚未在 GitHub 上生效。
 
+## P3 中文说明与关键链路进度
+
+- [x] 为身份解析、Flow API/Service、AWEL 本地 Runner、SQL Tool、组织快照服务的 20 个代表性 Python 函数补充实现对应的中文 docstring；AST 定点检查通过，清单见 [`key-function-inventory.md`](key-function-inventory.md)。
+- [x] 修复 `Flow Service.create()` 覆盖基类后未返回/未持久化的问题，并补充回归测试。
+- [ ] 回归测试文件因当前 Python 环境缺少 `sqlalchemy`，在导入阶段失败；安装批准依赖后需重跑。尚未覆盖的全仓关键函数、TypeScript/JSDoc 和权限行为仍需继续盘点/实现。
+
 ## 当前 P0 验收状态
 
 P0 的静态基线材料已生成；P0 尚未全部验收完成：来源哈希、完整路由授权证据、数据对象负责人、业务黄金集、内网身份/GPU/制品库等输入仍缺。因而当前报告可以作为团队可执行清单，不能标记企业平台 ready 或生产安全。

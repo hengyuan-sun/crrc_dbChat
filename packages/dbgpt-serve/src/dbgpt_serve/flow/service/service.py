@@ -113,26 +113,39 @@ class Service(BaseService[ServeEntity, ServeRequest, ServerResponse]):
         return self._serve_config
 
     def create(self, request: ServeRequest) -> ServerResponse:
-        """Create a new Flow entity
+        """仅按通用服务语义把 Flow 请求写入 DAO，不构建或注册 AWEL DAG。
 
         Args:
-            request (ServeRequest): The request
+            request: 已完成基本 schema 校验、准备持久化的 Flow 定义。
 
         Returns:
-            ServerResponse: The response
+            ServerResponse: DAO 保存后转换得到的 Flow 响应对象。
+
+        注意：这是 `BaseService.create` 的等价委托，不适用于需要立即构建
+        或部署 DAG 的入口；前端创建流程应调用 `create_and_save_dag`。
+        本方法和 DAO 当前不执行 workspace 资源授权，调用方须先完成可信鉴权。
         """
+        return super().create(request)
 
     def create_and_save_dag(
         self, request: ServeRequest, save_failed_flow: bool = False
     ) -> ServerResponse:
-        """Create a new Flow entity and save the DAG
+        """从画布请求构建 DAG、写入 Flow 记录，并按状态注册运行图。
 
         Args:
-            request (ServeRequest): The request
-            save_failed_flow (bool): Whether to save the failed flow
+            request: 包含 JSON Flow 描述或已构造 DAG 的请求。
+            save_failed_flow: 为真时将构建/注册失败记录为 `LOAD_FAILED`；
+                为假时构建失败直接抛错，注册失败会删除刚创建的 Flow 记录。
 
         Returns:
-            ServerResponse: The response
+            ServerResponse: DAO 查询得到的持久化 Flow 响应。
+
+        Raises:
+            ValueError: Flow 图构建失败且未启用失败记录时抛出。
+            Exception: DAG 注册失败时按上述回滚分支处理后重新抛出。
+
+        副作用：写入 DAO、更新状态及进程内 DAG registry。DAO 写入与 registry
+        注册并非跨系统原子事务；多实例一致性、workspace 授权和发布审批均未由本方法保证。
         """
         try:
             # Build DAG from request
@@ -195,7 +208,15 @@ class Service(BaseService[ServeEntity, ServeRequest, ServerResponse]):
                 )
 
     def load_dag_from_db(self):
-        """Load DAG from db"""
+        """启动恢复数据库中的 JSON Flow，并把运行态 DAG 注册到本进程。
+
+        遍历 DAO 返回的实体，逐条重建图；`DEPLOYED`、`RUNNING` 以及特定旧版本
+        的 `INITIALIZING` 流程会进入当前进程的 DAG registry，随后数据库状态更新为
+        `RUNNING`。单条加载失败只记日志并继续处理其他流程。
+
+        注意：当前扫描未在这里附加 workspace 过滤或全局发布版本锁；registry
+        是进程内状态，多副本注册和失败重试不具备分布式一致性保证。
+        """
         entities = self.dao.get_list({})
         for entity in entities:
             try:
@@ -260,14 +281,24 @@ class Service(BaseService[ServeEntity, ServeRequest, ServerResponse]):
         check_editable: bool = True,
         save_failed_flow: bool = False,
     ) -> ServerResponse:
-        """Update a Flow entity
+        """重建并替换指定 Flow 的持久化定义及其已注册 DAG。
 
         Args:
-            request (ServeRequest): The request
-            check_editable (bool): Whether to check the editable
-            save_failed_flow (bool): Whether to save the failed flow
+            request: 包含 Flow 标识和新图定义的请求。
+            check_editable: 为真时拒绝更新不可编辑记录。
+            save_failed_flow: 为真时把图加载失败记录为 `LOAD_FAILED`。
+
         Returns:
-            ServerResponse: The response
+            ServerResponse: 替换后从 DAO 返回的 Flow 响应。
+
+        Raises:
+            HTTPException: 流程不存在、不可编辑或状态变更非法时抛出。
+            Exception: 图构建、DAO 更新或重新注册失败时传播。
+
+        副作用：先更新 DAO、移除旧 registry 项，再调用创建/注册路径；异常时仅当
+        旧记录原状态为 `RUNNING` 才尝试重新创建它。其他状态没有等价恢复保证。
+        此流程不提供数据库与进程内 registry 的原子提交，也不执行 workspace
+        授权或版本审批，不能视作企业发布流程。
         """
         new_state = State.DEPLOYED
         try:
@@ -504,14 +535,17 @@ class Service(BaseService[ServeEntity, ServeRequest, ServerResponse]):
     async def safe_chat_flow(
         self, flow_uid: str, request: CommonLLMHttpRequestBody
     ) -> ModelOutput:
-        """Chat with the AWEL flow.
+        """调用已注册 Flow 的唯一叶子算子，并把异常转换为模型错误结果。
 
         Args:
-            flow_uid (str): The flow uid
-            request (CommonLLMHttpRequestBody): The request
+            flow_uid: 持久化 Flow 的 UID。
+            request: 对话输入、模型参数及增量输出选项。
 
         Returns:
-            ModelOutput: The output
+            ModelOutput: AWEL 输出，或带错误码和异常文本的失败结果。
+
+        注意：异常不会由该包装方法重新抛出；Flow 查询只按 UID，当前实现没有
+        在此处校验调用者、workspace、发布版本或其节点资源权限。
         """
         incremental = request.incremental
         try:
@@ -525,14 +559,17 @@ class Service(BaseService[ServeEntity, ServeRequest, ServerResponse]):
     async def safe_chat_stream_flow(
         self, flow_uid: str, request: CommonLLMHttpRequestBody
     ) -> AsyncIterator[ModelOutput]:
-        """Stream chat with the AWEL flow.
+        """以异步迭代器逐条转发已注册 Flow 的对话结果。
 
         Args:
-            flow_uid (str): The flow uid
-            request (CommonLLMHttpRequestBody): The request
+            flow_uid: 持久化 Flow 的 UID。
+            request: 对话输入、模型参数及增量输出选项。
 
         Returns:
-            AsyncIterator[ModelOutput]: The output
+            AsyncIterator[ModelOutput]: 逐条输出模型片段；失败时产出错误对象。
+
+        注意：下游迭代器消费时才会继续执行。当前包装会把异常转换为一个错误
+        `ModelOutput`；身份、workspace、已发布版本校验须由后续企业授权层补齐。
         """
         incremental = request.incremental
         try:
@@ -550,14 +587,17 @@ class Service(BaseService[ServeEntity, ServeRequest, ServerResponse]):
         self,
         flow_uid: str,
     ) -> BaseOperator:
-        """Return the callable task.
+        """从当前进程注册表中解析可供聊天执行的 Flow 叶子算子。
 
         Returns:
-            BaseOperator: The callable task
+            BaseOperator: 唯一叶子节点，作为 Agent/聊天执行入口。
 
         Raises:
-            HTTPException: If the flow is not found
-            ValueError: If the flow is not a chat flow or the leaf node is not found.
+            HTTPException: Flow UID 不存在，或 DAG 尚未在当前进程注册。
+            ValueError: DAG 叶子节点数量不是一个。
+
+        注意：此处仅以 UID 和进程内 dag_id 查找，没有资源所有权、workspace
+        或发布版本检查；调用链必须在进入本方法前完成可信认证和授权。
         """
         flow = self.get({"uid": flow_uid})
         if not flow:
@@ -627,14 +667,21 @@ class Service(BaseService[ServeEntity, ServeRequest, ServerResponse]):
     async def debug_flow(
         self, request: FlowDebugRequest, default_incremental: Optional[bool] = None
     ) -> AsyncIterator[ModelOutput]:
-        """Debug the flow.
+        """从请求体构建临时 DAG 并以异步结果流执行调试对话。
 
         Args:
-            request (FlowDebugRequest): The request
-            default_incremental (Optional[bool]): The default incremental configuration
+            request: 含临时图定义、聊天请求和可选 Flow 变量的调试载荷。
+            default_incremental: 若非空则覆盖请求中的增量输出配置。
 
         Returns:
-            AsyncIterator[ModelOutput]: The output
+            AsyncIterator[ModelOutput]: 依次产出调试结果或错误对象。
+
+        Raises:
+            ValueError: 叶子节点不是唯一节点，或请求体类型无效。
+
+        安全边界：临时 DAG 来自调用请求并直接交给 FlowFactory 构造，之后调用
+        节点工具；本方法未执行节点白名单、workspace 变量 ACL 或副作用审批，
+        不应在未授权的外部入口直接开放。
         """
         from dbgpt.core.awel.dag.dag_manager import _parse_metadata
 

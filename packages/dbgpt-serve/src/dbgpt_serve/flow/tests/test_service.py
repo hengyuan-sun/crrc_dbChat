@@ -10,6 +10,7 @@ from dbgpt_serve.core.tests.conftest import (  # noqa: F401
     system_app,
 )
 
+from ..api.schemas import ServeRequest, ServerResponse
 from ..service.service import Service
 
 
@@ -45,11 +46,14 @@ def test_config_exists(service: Service):
     assert service.config is not None
 
 
-def test_service_create(service: Service, default_entity_dict):
-    # TODO: implement your test case
-    # eg. entity: ServerResponse = service.create(ServeRequest(**default_entity_dict))
-    # ...
-    pass
+def test_service_create(service: Service):
+    request = ServeRequest(label="示例流程", name="sample_flow")
+
+    result = service.create(request)
+
+    assert isinstance(result, ServerResponse)
+    assert result.uid == request.uid
+    assert service.get({"uid": request.uid}) is not None
 
 
 def test_service_update(service: Service, default_entity_dict):

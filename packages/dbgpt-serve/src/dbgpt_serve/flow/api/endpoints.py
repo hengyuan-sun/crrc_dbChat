@@ -66,21 +66,25 @@ async def check_api_key(
     request: Request = None,
     service: Service = Depends(get_service),
 ) -> Optional[str]:
-    """Check the api key
+    """按 Flow 服务配置检查兼容 API Key；该检查不等同于资源授权。
 
-    If the api key is not set, allow all.
+    当前实现会直接放行 `/api/v1` 路径；其他路径仅在配置了 API Key 时校验
+    Bearer token。若未配置密钥则全部放行，因此生产环境不能依赖此函数完成
+    身份认证或 workspace/Flow 资源隔离。
 
-    Your can pass the token in you request header like this:
+    Args:
+        auth: FastAPI 提供的可选 Bearer 凭据。
+        request: 当前请求，用于检查路径兼容分支。
+        service: Flow 服务及其 API Key 配置。
 
-    .. code-block:: python
+    Returns:
+        Optional[str]: 校验通过时返回 token；放行或未配置密钥时返回 `None`。
 
-        import requests
+    Raises:
+        HTTPException: 已配置密钥但凭据缺失或不匹配时返回 401。
 
-        client_api_key = "your_api_key"
-        headers = {"Authorization": "Bearer " + client_api_key}
-        res = requests.get("http://test/hello", headers=headers)
-        assert res.status_code == 200
-
+    TODO 企业化：移除路径放行和无密钥放行，并在路由层使用可信身份上下文；
+    所有 Flow 读取、写入、调试、触发、导入和导出仍须执行逐资源授权。
     """
     if request.url.path.startswith("/api/v1"):
         return None
@@ -126,13 +130,20 @@ async def test_auth():
 async def create(
     request: ServeRequest, service: Service = Depends(get_service)
 ) -> Result[ServerResponse]:
-    """Create a new Flow entity
+    """接收画布提交的 Flow 定义并在服务线程中构建、保存和返回结果。
 
     Args:
-        request (ServeRequest): The request
-        service (Service): The service
+        request: 前端序列化的 Flow 描述，包含节点、边和流程元数据。
+        service: 注入的 Flow 服务实例。
+
     Returns:
-        ServerResponse: The response
+        Result[ServerResponse]: DAG 构建/保存成功后的流程响应。
+
+    Raises:
+        Exception: DAG 校验或持久化异常由服务/DAO 路径传播。
+
+    安全边界：当前路由依赖的 `check_api_key` 不能验证用户或 workspace，
+    本函数也没有将请求绑定到可信主体；企业授权接入前不得视为安全的创建入口。
     """
     res = await blocking_func_to_async(
         global_system_app, service.create_and_save_dag, request
@@ -425,7 +436,18 @@ async def get_variables_keys(
 async def debug_flow(
     flow_debug_request: FlowDebugRequest, service: Service = Depends(get_service)
 ):
-    """Run the flow in debug mode."""
+    """构建请求中的临时 Flow 并以服务端事件流返回调试输出。
+
+    Args:
+        flow_debug_request: 临时流程图、调试请求体及可选变量。
+        service: 注入的 Flow 服务实例。
+
+    Returns:
+        StreamingResponse: 包含流程文本片段、结束标记或服务端错误的 SSE 响应。
+
+    安全边界：调试会直接构建并运行请求携带的 DAG；目前没有在此处检查
+    workspace 归属、节点白名单或变量密钥范围。API Key 依赖也不构成用户授权。
+    """
     # Return the no-incremental stream by default
     stream_iter = service.debug_flow(flow_debug_request, default_incremental=False)
 

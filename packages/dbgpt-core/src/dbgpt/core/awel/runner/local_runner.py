@@ -48,17 +48,21 @@ class DefaultWorkflowRunner(WorkflowRunner):
         exist_dag_ctx: Optional[DAGContext] = None,
         dag_variables: Optional[DAGVariables] = None,
     ) -> DAGContext:
-        """Execute the workflow.
+        """以当前进程的本地 runner 从目标算子递归执行其上游 DAG。
 
         Args:
-            node (BaseOperator): The end node of the workflow.
-            call_data (Optional[CALL_DATA], optional): The call data of the end node.
-                Defaults to None.
-            streaming_call (bool, optional): Whether the call is streaming call.
-                Defaults to False.
-            exist_dag_ctx (Optional[DAGContext], optional): The exist DAG context.
-                Defaults to None.
-            dag_variables (Optional[DAGVariables], optional): The DAG variables.
+            node: 本次执行的目标算子，通常是 DAG 的叶子节点。
+            call_data: 绑定到目标节点的调用参数。
+            streaming_call: 标记本次调用是否采用流式语义。
+            exist_dag_ctx: 子图复用的既有上下文；提供时复用节点输出与共享数据。
+            dag_variables: 本次执行变量；与既有上下文合并时优先保留本参数值。
+
+        Returns:
+            DAGContext: 含节点输出、共享变量和执行状态的本地 DAG 上下文。
+
+        异常与副作用：算子异常沿调用链传播；非流式顶层 DAG 完成后触发 DAG 收尾。
+        该 runner 递归执行尚未缓存输出的上游节点，当前按顺序等待上游，不负责持久
+        队列、跨进程调度、重试、租约或取消恢复，不能据此推断为分布式执行器。
         """
         # Save node output
         # dag = node.dag
@@ -131,6 +135,24 @@ class DefaultWorkflowRunner(WorkflowRunner):
         skip_node_ids: Set[str],
         system_app: Optional[SystemApp],
     ):
+        """递归执行单个算子及其依赖，并记录任务状态和分支跳过结果。
+
+        同一 `node_id` 已有输出时直接复用；否则先按 `upstream` 顺序递归运行依赖，
+        再构造输入和 task context，注入 SystemApp 并调用算子的 `_run`。分支算子会
+        根据 task metadata 登记需要跳过的下游节点；算子异常会将当前任务置为失败并
+        向上传播，后续依赖不会执行。
+
+        Args:
+            job_manager: 为节点提供调用数据和本次运行信息的管理器。
+            node: 当前待执行算子。
+            dag_ctx: 共享 DAG 上下文。
+            node_outputs: 节点 ID 到 TaskContext 的执行结果缓存。
+            skip_node_ids: 分支决策产生的跳过节点集合。
+            system_app: 可选的系统组件容器，缺失于节点时注入。
+
+        副作用：更新共享结果/任务状态，写日志与 tracing span，并运行算子定义的外部操作。
+        并行调度与权限判断由其他层负责；此方法不检查 workspace 或节点 allowlist。
+        """
         # Skip run node
         if node.node_id in node_outputs:
             return
@@ -215,6 +237,18 @@ class DefaultWorkflowRunner(WorkflowRunner):
 def _skip_current_downstream_by_node_name(
     branch_node: BranchOperator, skip_nodes: List[str], skip_node_ids: Set[str]
 ):
+    """根据分支节点的输出标记递归登记应跳过的下游节点。
+
+    先收集名称命中或已登记的直接子节点，再批量写入跳过集合，确保 Join 等共享
+    下游节点能看到完整的已跳过父节点集合；随后继续向这些节点的下游传播。
+
+    Args:
+        branch_node: 已执行完成并产出分支选择 metadata 的分支算子。
+        skip_nodes: 分支算子 metadata 中声明跳过的节点名称。
+        skip_node_ids: 本次 DAG 运行共享的跳过节点 ID 集合，会被原地更新。
+
+    副作用：递归更新 `skip_node_ids` 并记录跳过日志；不执行节点，也不控制并发。
+    """
     if not skip_nodes:
         return
     nodes_to_skip = []
