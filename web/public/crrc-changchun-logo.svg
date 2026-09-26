@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 96" role="img" aria-labelledby="title desc">
+  <title id="title">CRRC 长客股份</title>
+  <desc id="desc">中国中车长春轨道客车股份有限公司</desc>
+  <rect width="440" height="96" rx="12" fill="#fff"/>
+  <g fill="#c6001a">
+    <path d="M17 20h58v10H28v36h47v10H17z"/>
+    <path d="M36 38h39v10H47v18H36z"/>
+  </g>
+  <text x="91" y="50" fill="#183b66" font-family="Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="1">CRRC</text>
+  <text x="92" y="76" fill="#333" font-family="Microsoft YaHei, sans-serif" font-size="18" font-weight="600">长春轨道客车股份有限公司</text>
+</svg>

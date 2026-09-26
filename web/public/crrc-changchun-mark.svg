@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">CRRC 长客股份</title>
+  <rect width="64" height="64" rx="14" fill="#fff"/>
+  <path d="M12 12h40v8H20v24h32v8H12zM27 27h25v8H35v9h-8z" fill="#c6001a"/>
+  <text x="32" y="60" fill="#183b66" font-family="Arial,sans-serif" font-size="7" font-weight="700" text-anchor="middle">CRRC</text>
+</svg>
